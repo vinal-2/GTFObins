@@ -40,9 +40,13 @@ Vinal-2 - Author of GTFOBins Vulnerability Scanner
 ## Installation
 Install the tool using pip:
 
-python -m pip install --upgrade pip
+```bash
+pip install gtfobins-scan==1.0.0
+
+Python:
 
 python -m pip install gtfobins-scan==1.0.0
 
-```bash
-pip install gtfobins-scan==1.0.0
+python -m pip install --upgrade pip
+
+
