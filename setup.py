@@ -8,6 +8,7 @@ setup(
     author='Vinal',
     url='https://github.com/vinal-2/GTFObins',
     license='GPL-3.0',
+    scripts=['gtfobins_scan.sh'],
     
     entry_points={
         'console_scripts': [
