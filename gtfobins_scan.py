@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import os
 import requests
-import sys
 import subprocess
+import sys
 import threading
+import argparse
 
 # Define the welcome message
 WELCOME_MSG = "GTFObins Scan"
@@ -54,7 +55,6 @@ def check_gtfo(binary):
 def runtime_progress(pid):
     delay = 0.1
     spin = ["-", "/", "|", "\\"]
-
     sys.stdout.write("Scanning GTFOBins... ")
 
     while os.path.exists(f"/proc/{pid}"):
@@ -67,22 +67,50 @@ def runtime_progress(pid):
 
 
 def main():
-    print("Scanning for SUID binaries...")
-    suid_binaries = subprocess.check_output(
-        ["find", "/", "-type", "f", "-perm", "-4000"],
-        stderr=subprocess.DEVNULL,
-        text=True,
+    parser = argparse.ArgumentParser(
+        description="Scan for SUID binaries and check against GTFOBins."
     )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable verbose mode"
+    )
+    args = parser.parse_args()
+
+    try:
+        suid_binaries = subprocess.check_output(
+            [
+                "find",
+                "/",
+                "-type",
+                "f",
+                "-perm",
+                "-4000",
+                "!",
+                "-path",
+                "/proc*",
+                "-prune",
+                "!",
+                "-path",
+                "/run/user*",
+                "-prune",
+            ],
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        ).strip()
+    except subprocess.CalledProcessError as e:
+        suid_binaries = ""
+        print(f"Error occurred while finding SUID binaries: {e.stderr}")
+
     suid_binaries = suid_binaries.strip().split("\n")
 
     if not suid_binaries:
         print("No SUID binaries found.")
         sys.exit(1)
 
-    print("----------------------------------------")
-    highlight("SUID Binaries:")
-    print("\n".join(suid_binaries))
-    print("----------------------------------------")
+    if args.verbose:
+        print("----------------------------------------")
+        highlight("SUID Binaries:")
+        print("\n".join(suid_binaries))
+        print("----------------------------------------")
 
     # Populate dictionary for easy lookup
     for binary in suid_binaries:
