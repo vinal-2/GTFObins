@@ -1,26 +1,21 @@
 #!/usr/bin/env python3
 import os
-import requests
 import subprocess
 import sys
 import threading
 import argparse
+import yaml
 
 # Define the welcome message
 WELCOME_MSG = "GTFObins Scan"
 
 # Define the colors
-RED = "\033[0;31m"
 GREEN = "\033[0;32m"
-YELLOW = "\033[0;33m"
-BLUE = "\033[0;34m"
-PURPLE = "\033[0;35m"
 CYAN = "\033[0;36m"
-WHITE = "\033[0;37m"
 
 # Define the ASCII art
 ART = r"""
-    /\_/\
+    /\_/\ 
    ( o   o )
     > ^ <
 """
@@ -28,42 +23,87 @@ ART = r"""
 # Print the welcome message and ASCII art
 print(f"{GREEN}{WELCOME_MSG}\n{ART}")
 
-# Configuration
-GTFOBINS_URL = "https://gtfobins.github.io/gtfobins"
-GTFOBINS_EXEC_DIR = "_gtfobins"
-GTFOBINS_EXEC_EXT = ".md"
-
 suid_binaries_map = {}
+
+
+def clone_gtfo():
+    # Create a new directory for the repository and navigate into it
+    os.makedirs("GTFOBins", exist_ok=True)
+    os.chdir("GTFOBins")
+
+    # Initialize an empty Git repository and add your remote repository
+    subprocess.run(["git", "init"])
+    subprocess.run(
+        [
+            "git",
+            "remote",
+            "add",
+            "-f",
+            "origin",
+            "https://github.com/GTFOBins/GTFOBins.github.io.git",
+        ]
+    )
+
+    # Enable the sparse checkout feature
+    subprocess.run(["git", "config", "core.sparseCheckout", "true"])
+
+    # Define the files or folders you want to check out by adding them to `.git/info/sparse-checkout`
+    with open(".git/info/sparse-checkout", "w") as f:
+        f.write("_gtfobins/")
+
+    # Pull the data from the remote repository
+    subprocess.run(["git", "pull", "origin", "master"])
+
+    # Change back to the original directory
+    os.chdir("..")
 
 
 def highlight(msg):
     print(f"\033[1;32m{msg}\033[0m")
 
 
+def check_binary(binary):
+    # Check if the binary exists in the system's PATH
+    binary_path = subprocess.run(
+        ["which", binary], capture_output=True, text=True
+    ).stdout.strip()
+
+    if binary_path:
+        return True
+    else:
+        return False
+
+
 def check_gtfo(binary):
-    response = requests.get(f"{GTFOBINS_URL}/{binary}/")
-    gtfo_results = (
-        response.text.split("<pre")[1].split("</pre>")[0] if response.ok else None
-    )
+    # specify the path to the directory containing the .md files
+    directory_path = "GTFOBins/_gtfobins/"
 
-    if gtfo_results:
-        highlight(f"Potential privilege escalation techniques for {binary}:")
-        print(gtfo_results)
-        print("----------------------------------------")
+    # specify the path to the .md file for the binary
+    file_path = os.path.join(directory_path, f"{binary}.md")
 
+    try:
+        # open the .md file
+        with open(file_path, "r") as file:
+            file_content = file.read()
 
-def runtime_progress(pid):
-    delay = 0.1
-    spin = ["-", "/", "|", "\\"]
-    sys.stdout.write("Scanning GTFOBins... ")
+        # parse the YAML content
+        documents = yaml.safe_load_all(file_content)
 
-    while os.path.exists(f"/proc/{pid}"):
-        for char in spin:
-            sys.stdout.write("\b" + char)
-            sys.stdout.flush()
-            subprocess.call(["sleep", str(delay)])
+        for doc in documents:
+            if doc is not None and "functions" in doc:
+                functions = doc["functions"]
 
-    print("\bDone!")
+                # print the potential privilege escalation techniques for the binary
+                for function, details in functions.items():
+                    highlight(
+                        f"Potential privilege escalation techniques for {binary} using {function}:"
+                    )
+                    for detail in details:
+                        print(detail["code"])
+                    print("----------------------------------------")
+
+    except FileNotFoundError:
+        print(f"No .md file found for {binary}.")
 
 
 def main():
@@ -73,63 +113,36 @@ def main():
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enable verbose mode"
     )
+    parser.add_argument("-o", "--output", type=str, help="Specify output file")
     args = parser.parse_args()
 
-    try:
-        suid_binaries = subprocess.check_output(
-            [
-                "find",
-                "/",
-                "-type",
-                "f",
-                "-perm",
-                "-4000",
-                "!",
-                "-path",
-                "/proc*",
-                "-prune",
-                "!",
-                "-path",
-                "/run/user*",
-                "-prune",
-            ],
-            stderr=subprocess.PIPE,
-            universal_newlines=True,
-        ).strip()
-    except subprocess.CalledProcessError as e:
-        suid_binaries = ""
-        print(f"Error occurred while finding SUID binaries: {e.stderr}")
+    # Clone the _gtfobins directory from the GTFOBins/GTFOBins.github.io repository
+    clone_gtfo()
 
-    suid_binaries = suid_binaries.strip().split("\n")
+    # specify the path to the directory containing the .md files
+    directory_path = "GTFOBins/_gtfobins/"
 
-    if not suid_binaries:
-        print("No SUID binaries found.")
-        sys.exit(1)
+    # Get all .md files in the specified directory
+    files = [f[:-3] for f in os.listdir(directory_path) if f.endswith(".md")]
 
-    if args.verbose:
-        print("----------------------------------------")
-        highlight("SUID Binaries:")
-        print("\n".join(suid_binaries))
-        print("----------------------------------------")
+    # Redirect stdout to the output file if specified
+    if args.output:
+        sys.stdout = open(args.output, "w")
 
-    # Populate dictionary for easy lookup
-    for binary in suid_binaries:
-        suid_binaries_map[binary] = 1
+    print("## Binary Identified\n")
+    for binary in files:
+        if check_binary(binary):
+            print(f"The binary {binary} exists in the system's PATH.")
+            check_gtfo(binary)
 
-    # Check if curl is available
-    try:
-        subprocess.check_output(["curl", "--version"])
-    except subprocess.CalledProcessError:
-        print("Error: curl command not found. Please install curl.")
-        sys.exit(1)
-
-    # Display runtime progress
-    threading.Thread(target=runtime_progress, args=(os.getpid(),)).start()
-
-    # Check SUID binaries against GTFOBins
-    for binary in suid_binaries_map:
-        check_gtfo(binary)
+    print("\n## Binaries not on local system\n")
+    for binary in files:
+        if not check_binary(binary):
+            print(f"The binary {binary} does not exist in the system's PATH.")
 
 
 if __name__ == "__main__":
     main()
+
+    # Restore standard output
+    sys.stdout = sys.__stdout__
