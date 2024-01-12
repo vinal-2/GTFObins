@@ -1,12 +1,13 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="gtfobins-scan",
-    version="2.0",
+    name="gtfobins_scan",
+    version="3.0",
     description="Vulnerability Scanner for GTFOBins",
     packages=find_packages(),
     install_requires=[
-        "requests",
+        "gitpython",
+        "pyyaml",
     ],
     author="Vinal",
     url="https://github.com/vinal-2/GTFObins",
