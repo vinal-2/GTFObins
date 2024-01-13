@@ -3,8 +3,8 @@ The script will scan for SUID binaries on the system and check them against GTFO
 
 # GTFOBins Vulnerability Scanner
 
-![GTFOBins Vulnerability Scanner]
-![image](https://github.com/vinal-2/GTFObins/assets/97253630/4fd0d000-1c8c-4be6-ba9e-5d4ecbef8a40)
+![GTFOBins Vulnerability Scanner]![Walkthrough](https://github.com/vinal-2/GTFObins/assets/97253630/c5f2848f-c8b6-469e-ae98-38d2ba6bfccc)
+
 
 ## Overview
 
@@ -49,7 +49,7 @@ Vinal-2 - Author of GTFOBins Vulnerability Scanner
 
 Clone repository:
 ```bash
-git clone https://github.com/vinal-2/GTFObins.git
+git clone https://github.com/vinal-2/GTFObins
 ```
 Install the tool using pip:
 ```bash
