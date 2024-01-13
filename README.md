@@ -2,7 +2,7 @@
 The script will scan for SUID binaries on the system and check them against GTFOBins for potential vulnerabilities and privilege escalation techniques.
 
 ## What are GTFO Binaries
-Gtfobins has made a significant impact on the cybersecurity landscape by providing a comprehensive collection of “gtfo” binaries and associated techniques. Accoring to [DotComMagazine]( https://dotcommagazine.com/2023/07/gtfobins-top-ten-things-you-need-to-know/) Gtfobins are a collection of Unix-binaries. These binaries can be leveraged to escalate privileges, bypass security restrictions, and gain unauthorized access to systems.
+Gtfobins has made a significant impact on the cybersecurity landscape by providing a comprehensive collection of “gtfo” binaries and associated techniques. Accoring to [DotComMagazine]( https://dotcommagazine.com/2023/07/gtfobins-top-ten-things-you-need-to-know/) Gtfobins are a collection of Linux/Unix-binaries. These binaries can be leveraged to escalate privileges, bypass security restrictions, and gain unauthorized access to systems.
 
 Thus empowers security professionals to test the security of their systems and identify potential vulnerabilities. It serves as a valuable resource for penetration testing, vulnerability assessments, and red teaming exercises. Additionally, system administrators can leverage Gtfobins to better understand the risks associated with certain binaries and implement appropriate security measures to protect their systems. This tool will help you do just that.
 
