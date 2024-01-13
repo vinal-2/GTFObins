@@ -32,7 +32,7 @@ The GTFOBins Vulnerability Scanner is a tool designed to identify potential vuln
 ## License
 This tool is licensed under the GPL-3.0 License - see the LICENSE file for details.
 
-## Acknowledgments
+## Acknowledgments and Special Thanks:
 GTFOBins ([gtfobins.github.io](https://github.com/GTFOBins/GTFOBins.github.io/tree/master)) - A fantastic resource for binary exploitation techniques.
 Credits to this repository for providing the main source for ALL the GTFO Binaries inforamtion.
 
@@ -46,8 +46,12 @@ For bug reports or feature requests, please open an issue on GitHub.
 Vinal-2 - Author of GTFOBins Vulnerability Scanner
 
 ## Installation
-Install the tool using pip:
 
+Clone repository:
+```bash
+git clone https://github.com/vinal-2/GTFObins.git
+```
+Install the tool using pip:
 ```bash
 pip install gtfobins-scan
 ```
@@ -83,18 +87,27 @@ Identify SUID binaries and check for privilege escalation techniques:
 ```python
 python gtfobins_scan.py
 ```
-
+```python
+python3 gtfobins_scan.py
+```
 Enable verbose mode and specify an output file:
 ```python
-python gtfobins_scan.py
+python gtfobins_scan.py -v
 ```
-
+```python
+python3 gtfobins_scan.py -v
+```
 Specify an output file for the scan results:
 ```python
 python gtfobins_scan.py -o output.txt
 ```
-
+```python
+python3 gtfobins_scan.py -o output.txt
+```
 Enable verbose mode and specify an output file:
 ```python
 python gtfobins_scan.py -v -o output.txt
+```
+```python
+python3 gtfobins_scan.py -v -o output.txt
 ```
