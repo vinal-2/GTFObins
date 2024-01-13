@@ -35,7 +35,7 @@ The GTFOBins Vulnerability Scanner is a tool designed to identify potential vuln
 ## License
 This tool is licensed under the GPL-3.0 License - see the LICENSE file for details.
 
-## Acknowledgments and Special Thanks:
+## Acknowledgments and Special Thanks
 GTFOBins ([gtfobins.github.io](https://github.com/GTFOBins/GTFOBins.github.io/tree/master)) - A fantastic resource for binary exploitation techniques.
 Credits to this repository for providing the main source for ALL the GTFO Binaries inforamtion.
 
